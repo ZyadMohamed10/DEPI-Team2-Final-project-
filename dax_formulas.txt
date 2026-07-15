@@ -1,0 +1,594 @@
+==================================================
+               DAX MEASURES                       
+==================================================
+
+Measure: [AOV] in Table 'measure'
+DAX Formula:
+AOV =
+DIVIDE([Total Revenue],[Total transactions],0)
+--------------------------------------------------
+
+Measure: [AVG CL(month)] in Table 'measure'
+DAX Formula:
+AVG CL(month) =
+AVERAGE(customers[Customer Lifespan (Month)])
+--------------------------------------------------
+
+Measure: [AVG Given Discount%] in Table 'measure'
+DAX Formula:
+AVG Given Discount% =
+CALCULATE(AVERAGE(transactions[Discount]),transactions[Discount]<>0.00)
+--------------------------------------------------
+
+Measure: [AVG profit per invoice] in Table 'measure'
+DAX Formula:
+AVG profit per invoice =
+[Total profit] / [Total transactions]
+--------------------------------------------------
+
+Measure: [AVG unit per invoice] in Table 'measure'
+DAX Formula:
+AVG unit per invoice =
+DIVIDE(SUM(transactions[Quantity]),[Total transactions],0)
+--------------------------------------------------
+
+Measure: [Active Employees] in Table 'measure'
+DAX Formula:
+Active Employees =
+DISTINCTCOUNT(transactions[Employee ID])
+--------------------------------------------------
+
+Measure: [Active customers] in Table 'measure'
+DAX Formula:
+Active customers =
+DISTINCTCOUNT(transactions[Customer ID])
+--------------------------------------------------
+
+Measure: [CLV] in Table 'measure'
+DAX Formula:
+CLV =
+[AOV] * [Purchase Frequency] * [Gross Margin %] * [AVG CL(month)]
+--------------------------------------------------
+
+Measure: [COGS] in Table 'measure'
+DAX Formula:
+COGS =
+SUMX(transactions, RELATED(products[Production Cost])*transactions[Quantity])
+--------------------------------------------------
+
+Measure: [Count of discounts] in Table 'measure'
+DAX Formula:
+Count of discounts =
+CALCULATE(COUNT(transactions[Discount]),transactions[Discount]<>0.00)
+--------------------------------------------------
+
+Measure: [Countries] in Table 'measure'
+DAX Formula:
+Countries =
+DISTINCTCOUNT(stores[Country])
+--------------------------------------------------
+
+Measure: [Gross Margin %] in Table 'measure'
+DAX Formula:
+Gross Margin % =
+DIVIDE([Total Profit], [Total Revenue], 0)
+--------------------------------------------------
+
+Measure: [New Customers] in Table 'measure'
+DAX Formula:
+New Customers =
+VAR TransactionCustomers =
+    DISTINCT(transactions[Customer ID])
+
+VAR RegisteredCustomers =
+    DISTINCT(customers[Customer ID])
+
+RETURN
+COUNTROWS(
+    EXCEPT(
+        TransactionCustomers,
+        RegisteredCustomers
+    )
+)
+--------------------------------------------------
+
+Measure: [P_M of Discounted Sales] in Table 'measure'
+DAX Formula:
+P_M of Discounted Sales =
+CALCULATE(
+    [Gross Margin %],
+    transactions[Type of transactions] = "Discounted"
+)
+--------------------------------------------------
+
+Measure: [P_M of Full Price sales] in Table 'measure'
+DAX Formula:
+P_M of Full Price sales =
+CALCULATE(
+    [Gross Margin %],
+    transactions[Type of transactions] = "Full price"
+)
+--------------------------------------------------
+
+Measure: [Purchase Frequency] in Table 'measure'
+DAX Formula:
+Purchase Frequency =
+DIVIDE([Total transactions], [Active customers])
+--------------------------------------------------
+
+Measure: [Refund count] in Table 'measure'
+DAX Formula:
+Refund count =
+CALCULATE(DISTINCTCOUNT(transactions[Invoice ID]),transactions[Transaction Type]="Return")
+--------------------------------------------------
+
+Measure: [Refund rate %] in Table 'measure'
+DAX Formula:
+Refund rate % =
+DIVIDE([Refund count],[Total transactions])
+--------------------------------------------------
+
+Measure: [Repeat Purchase Rate %] in Table 'measure'
+DAX Formula:
+Repeat Purchase Rate % =
+VAR CustomersWithRepeat =
+    CALCULATE(
+        DISTINCTCOUNT(transactions[Customer ID]),
+        FILTER(
+            VALUES(transactions[Customer ID]),
+            CALCULATE(DISTINCTCOUNT(transactions[Invoice ID])) > 1
+        )
+    )
+VAR TotalCustomers = DISTINCTCOUNT(transactions[Customer ID])
+RETURN DIVIDE(CustomersWithRepeat, TotalCustomers)
+--------------------------------------------------
+
+Measure: [Stores] in Table 'measure'
+DAX Formula:
+Stores =
+DISTINCTCOUNT(stores[Store ID])
+--------------------------------------------------
+
+Measure: [Total Products in Catalog] in Table 'measure'
+DAX Formula:
+Total Products in Catalog =
+DISTINCTCOUNT(products[Product ID])
+--------------------------------------------------
+
+Measure: [Total Return Value] in Table 'measure'
+DAX Formula:
+Total Return Value =
+ABS(
+    CALCULATE([Total Revenue], transactions[Transaction Type] = "return") )
+--------------------------------------------------
+
+Measure: [Total Revenue] in Table 'measure'
+DAX Formula:
+Total Revenue =
+SUM(transactions[line Total USD])
+--------------------------------------------------
+
+Measure: [Total Revenue under Discount] in Table 'measure'
+DAX Formula:
+Total Revenue under Discount =
+CALCULATE(SUM(transactions[line Total USD]),transactions[Type of transactions]="Discounted")
+--------------------------------------------------
+
+Measure: [Total customers] in Table 'measure'
+DAX Formula:
+Total customers =
+(DISTINCTCOUNT(customers[Customer ID])) + [New Customers]
+--------------------------------------------------
+
+Measure: [Total profit] in Table 'measure'
+DAX Formula:
+Total profit =
+[Total Revenue] - [COGS]
+--------------------------------------------------
+
+Measure: [Total quantity] in Table 'measure'
+DAX Formula:
+Total quantity =
+SUM(transactions[Quantity])
+--------------------------------------------------
+
+Measure: [Total transactions] in Table 'measure'
+DAX Formula:
+Total transactions =
+DISTINCTCOUNT(transactions[Invoice ID])
+--------------------------------------------------
+
+Measure: [employees] in Table 'measure'
+DAX Formula:
+employees =
+DISTINCTCOUNT(employees[Employee ID])
+--------------------------------------------------
+
+==================================================
+               DAX CALCULATED COLUMNS             
+==================================================
+
+Calculated Column: 'Age' in Table 'customers'
+DAX Formula:
+Age =
+DATEDIFF(customers[Date Of Birth], TODAY(), YEAR)
+--------------------------------------------------
+
+Calculated Column: 'Customer Lifespan (Month)' in Table 'customers'
+DAX Formula:
+Customer Lifespan (Month) =
+VAR FirstPurchase =
+    CALCULATE(
+        MIN(transactions[Date]),
+        ALLEXCEPT(transactions, transactions[Customer ID])
+    )
+
+VAR LastPurchase =
+    CALCULATE(
+        MAX(transactions[Date]),
+         ALLEXCEPT(transactions, transactions[Customer ID])
+    )
+
+RETURN
+DATEDIFF(FirstPurchase, LastPurchase, MONTH)
+--------------------------------------------------
+
+Calculated Column: 'Generation' in Table 'customers'
+DAX Formula:
+Generation =
+SWITCH(
+    TRUE(),
+    customers[Age] >= 60, "Boomer+",
+    customers[Age] >= 44, "Gen X",
+    customers[Age] >= 28, "Millennial",
+    "Gen Z"
+)
+--------------------------------------------------
+
+Calculated Column: 'Job Category' in Table 'customers'
+DAX Formula:
+Job Category =
+SWITCH(
+    TRUE(),
+
+    -- Agriculture & Environment
+    [Job Title] IN {
+        "Agricultural consultant", "Agricultural engineer", "Animal nutritionist",
+        "Animal technologist", "Ecologist", "Environmental consultant",
+        "Environmental education officer", "Environmental health practitioner",
+        "Farm manager", "Fish farm manager", "Fisheries officer",
+        "Nature conservation officer", "Operations geologist", "Rural practice surveyor",
+        "Soil scientist", "Water quality scientist", "Wellsite geologist",
+        "Geologist, engineering", "Geologist, wellsite", "Geophysical data processor",
+        "Geophysicist/field seismologist", "Geoscientist", "Engineering geologist",
+        "Geographical information systems officer", "Herbalist", "Tree surgeon",
+        "Waste management officer", "Water engineer", "Ranger/warden",
+        "Warden/ranger", "Mudlogger", "Drilling engineer", "Seismic interpreter",
+        "Minerals surveyor"
+    }, "Agriculture & Environment",
+
+    -- Armed Forces & Security
+    [Job Title] IN {
+        "Armed forces logistics/support/administrative officer",
+        "Armed forces operational officer", "Armed forces technical officer",
+        "Armed forces training and education officer", "Police officer",
+        "Prison officer", "Probation officer"
+    }, "Armed Forces & Security",
+
+    -- Arts, Media & Design
+    [Job Title] IN {
+        "Actor", "Animator", "Architect", "Architectural technologist",
+        "Art restorer", "Artist", "Arts administrator", "Arts development officer",
+        "Broadcast engineer", "Broadcast journalist", "Broadcast presenter",
+        "Ceramics designer", "Copy", "Copywriter, advertising",
+        "Editor, commissioning", "Editor, film/video", "Editor, magazine features",
+        "Editorial assistant", "Exhibition designer", "Exhibitions officer, museum/gallery",
+        "Fashion designer", "Film/video editor", "Fine artist",
+        "Glass blower/designer", "Graphic designer", "Interior and spatial designer",
+        "Jewellery designer", "Journalist, broadcasting", "Journalist, magazine",
+        "Journalist, newspaper", "Magazine features editor", "Magazine journalist",
+        "Media buyer", "Media planner", "Medical illustrator",
+        "Multimedia programmer", "Multimedia specialist", "Museum education officer",
+        "Museum/gallery conservator", "Museum/gallery curator",
+        "Museum/gallery exhibitions officer", "Music therapist", "Music tutor",
+        "Musician", "Naval architect", "Newspaper journalist",
+        "Press photographer", "Press sub", "Producer, radio",
+        "Producer, television/film/video", "Product designer",
+        "Production assistant, radio", "Production assistant, television",
+        "Production designer", "Public librarian", "Publishing copy",
+        "Publishing rights manager", "Radio broadcast assistant", "Radio producer",
+        "Runner, broadcasting/film/video", "Set designer", "Sound technician, broadcasting/film/video",
+        "Special effects artist", "Stage manager", "Technical author",
+        "Technical brewer", "Video editor", "Visual merchandiser",
+        "Web designer", "Writer", "Presenter, broadcasting"
+    }, "Arts, Media & Design",
+
+    -- Construction & Surveying
+    [Job Title] IN {
+        "Architectural technologist", "Building control surveyor",
+        "Building services engineer", "Cartographer", "Civil engineer",
+        "Conservation officer, historic buildings", "Conservation officer, nature",
+        "Conservator, furniture", "Conservator, museum/gallery",
+        "Consulting civil engineer", "Contracting civil engineer",
+        "Estate agent", "Estate manager/land agent", "Facilities manager",
+        "Land", "Land/geomatics surveyor", "Landscape architect",
+        "Planning and development surveyor", "Plant breeder/geneticist",
+        "Quantity surveyor", "Surveyor, commercial/residential",
+        "Surveyor, hydrographic", "Surveyor, insurance", "Surveyor, land/geomatics",
+        "Surveyor, minerals", "Surveyor, mining", "Surveyor, planning and development",
+        "Surveyor, quantity", "Surveyor, rural practice", "Town planner",
+        "Quarry manager"
+    }, "Construction & Surveying",
+
+    -- Education
+    [Job Title] IN {
+        "Associate Professor", "Early years teacher", "Education administrator",
+        "Education officer, community", "Education officer, environmental",
+        "Education officer, museum", "Educational psychologist",
+        "English as a foreign language teacher", "English as a second language teacher",
+        "Higher education careers adviser", "Higher education lecturer",
+        "Outdoor activities/education manager", "Primary school teacher",
+        "Private music teacher", "Secondary school teacher",
+        "Special educational needs teacher", "Teacher, adult education",
+        "Teacher, early years/pre", "Teacher, English as a foreign language",
+        "Teacher, music", "Teacher, primary school", "Teacher, secondary school",
+        "Teacher, special educational needs", "Teaching laboratory technician",
+        "Academic librarian", "Adult guidance worker"
+    }, "Education",
+
+    -- Engineering
+    [Job Title] IN {
+        "Biomedical engineer", "Chemical engineer", "Control and instrumentation engineer",
+        "Electrical engineer", "Electronics engineer", "Energy engineer",
+        "Engineer, drilling", "Engineer, electrical", "Engineer, electronics",
+        "Engineer, energy", "Engineer, land", "Engineer, maintenance",
+        "Engineer, maintenance (IT)", "Engineer, manufacturing",
+        "Engineer, manufacturing systems", "Engineer, materials", "Engineer, mining",
+        "Engineer, petroleum", "Engineer, production", "Engineer, site",
+        "Engineer, structural", "Engineer, technical sales", "Engineer, water",
+        "Manufacturing engineer", "Manufacturing systems engineer",
+        "Materials engineer", "Mechanical engineer", "Mining engineer",
+        "Network engineer", "Petroleum engineer", "Automotive engineer",
+        "Biomedical scientist", "Brewing technologist"
+    }, "Engineering",
+
+    -- Finance & Accounting
+    [Job Title] IN {
+        "Accountant, chartered", "Accountant, chartered certified",
+        "Accountant, chartered management", "Accountant, chartered public finance",
+        "Accounting technician", "Actuary", "Bonds trader",
+        "Chartered accountant", "Chartered certified accountant",
+        "Chartered legal executive (England and Wales)", "Chartered loss adjuster",
+        "Chartered management accountant", "Chartered public finance accountant",
+        "Corporate investment banker", "Corporate treasurer",
+        "Financial adviser", "Financial controller", "Financial manager",
+        "Financial planner", "Financial risk analyst", "Financial trader",
+        "Insurance broker", "Insurance claims handler", "Insurance risk surveyor",
+        "Insurance underwriter", "Investment analyst", "Investment banker, corporate",
+        "Investment banker, operational", "Loss adjuster, chartered",
+        "Operational investment banker", "Pension scheme manager",
+        "Pensions consultant", "Tax adviser", "Tax inspector",
+        "Senior tax professional/tax inspector"
+    }, "Finance & Accounting",
+
+    -- Healthcare & Medicine
+    [Job Title] IN {
+        "Acupuncturist", "Adult nurse", "Ambulance person",
+        "Audiological scientist", "Biochemist, clinical", "Chiropractor",
+        "Cytogeneticist", "Dance movement psychotherapist", "Doctor, general practice",
+        "Doctor, hospital", "Dramatherapist", "Embryologist, clinical",
+        "Exercise physiologist", "Haematologist", "Health and safety adviser",
+        "Health and safety inspector", "Health physicist",
+        "Health promotion specialist", "Health service manager", "Health visitor",
+        "Herpetologist", "Medical laboratory scientific officer", "Medical physicist",
+        "Medical sales representative", "Medical secretary",
+        "Medical technical officer", "Midwife", "Neurosurgeon",
+        "Nurse, adult", "Nurse, children's", "Nurse, learning disability",
+        "Occupational therapist", "Oncologist", "Ophthalmologist",
+        "Optician, dispensing", "Optometrist", "Orthoptist", "Osteopath",
+        "Paediatric nurse", "Paramedic", "Pathologist", "Podiatrist",
+        "Radiation protection practitioner", "Radiographer, diagnostic",
+        "Radiographer, therapeutic", "Speech and language therapist",
+        "Sport and exercise psychologist", "Sports therapist",
+        "Toxicologist", "Veterinary surgeon", "Dispensing optician",
+        "Herbalist"
+    }, "Healthcare & Medicine",
+
+    -- Hospitality & Food
+    [Job Title] IN {
+        "Amenity horticulturist", "Barista", "Catering manager",
+        "Chef", "Conference centre manager", "Event organiser",
+        "Fast food restaurant manager", "Hospitality manager",
+        "Travel agency manager"
+    }, "Hospitality & Food",
+
+    -- IT & Technology
+    [Job Title] IN {
+        "Applications developer", "Computer games developer", "Data processing manager",
+        "Data scientist", "Database administrator", "IT consultant",
+        "IT sales professional", "IT technical support officer", "IT trainer",
+        "Network engineer", "Software engineer", "Systems analyst",
+        "Systems developer", "Technical sales engineer", "Web designer",
+        "Intelligence analyst"
+    }, "IT & Technology",
+
+    -- Legal & Law
+    [Job Title] IN {
+        "Barrister", "Barrister's clerk", "Chartered legal executive (England and Wales)",
+        "Lawyer", "Patent attorney", "Patent examiner", "Solicitor",
+        "Solicitor, Scotland", "Trade mark attorney"
+    }, "Legal & Law",
+
+    -- Management & Administration
+    [Job Title] IN {
+        "Accommodation manager", "Administrator", "Administrator, arts",
+        "Administrator, charities/voluntary organisations",
+        "Administrator, Civil Service", "Administrator, education",
+        "Administrator, local government", "Administrator, sports",
+        "Careers adviser", "Careers information officer",
+        "Chief Executive Officer", "Chief Financial Officer",
+        "Chief Marketing Officer", "Chief of Staff",
+        "Chief Operating Officer", "Chief Strategy Officer",
+        "Chief Technology Officer", "Contractor", "Customer service manager",
+        "Facilities manager", "Location manager",
+        "Logistics and distribution manager", "Make",
+        "Management consultant", "Office manager", "Operations geologist",
+        "Passenger transport manager", "Personnel officer",
+        "Politician's assistant", "Print production planner",
+        "Product manager", "Purchasing manager", "Quality manager",
+        "Records manager", "Recruitment consultant", "Regulatory affairs officer",
+        "Ship broker", "Site engineer", "Training and development officer",
+        "Transport planner", "Warehouse manager"
+    }, "Management & Administration",
+
+    -- Sales & Marketing
+    [Job Title] IN {
+        "Advertising account executive", "Advertising account planner",
+        "Charity fundraiser", "Charity officer", "Field trials officer",
+        "Marketing executive", "Public relations account executive",
+        "Public relations officer", "Race relations officer",
+        "Sales executive", "Sales professional, IT",
+        "Sales promotion account executive", "Technical sales engineer"
+    }, "Sales & Marketing",
+
+    -- Science & Research
+    [Job Title] IN {
+        "Analytical chemist", "Archaeologist", "Archivist",
+        "Astronomer", "Biologist", "Biochemist, clinical",
+        "Chemist, analytical", "Data scientist", "Ecologist",
+        "Embryologist, clinical", "Geographer", "Geologist, engineering",
+        "Government social research officer", "Haematologist",
+        "Marine scientist", "Market researcher", "Microbiologist",
+        "Meteorologist", "Oceanographer", "Operational researcher",
+        "Pathologist", "Research officer, government",
+        "Research officer, political party", "Research officer, trade union",
+        "Research scientist (life sciences)", "Scientist, audiological",
+        "Scientist, biomedical", "Scientist, clinical (histocompatibility and immunogenetics)",
+        "Scientist, forensic", "Scientist, marine", "Scientist, physiological",
+        "Scientist, product/process development", "Scientist, research (life sciences)",
+        "Scientist, research (maths)", "Scientist, research (medical)",
+        "Scientist, research (physical sciences)", "Scientist, water quality",
+        "Science writer", "Scientific laboratory technician",
+        "Social researcher", "Toxicologist", "Trading standards officer",
+        "Geophysical data processor", "Geophysicist/field seismologist"
+    }, "Science & Research",
+
+    -- Social & Community Services
+    [Job Title] IN {
+        "Adult guidance worker", "Charity officer", "Child psychotherapist",
+        "Community development worker", "Counselling psychologist", "Counsellor",
+        "Heritage manager", "Historic buildings inspector/conservation officer",
+        "Holiday representative", "International aid/development worker",
+        "Interpreter", "Museum education officer", "Probation officer",
+        "Psychologist", "Social research officer, government",
+        "Social worker", "Speech and language therapist",
+        "Translator", "Volunteer coordinator", "Youth worker"
+    }, "Social & Community Services",
+
+    -- Students
+    [Job Title] = "Students", "Students",
+
+    -- Default
+    "Other"
+)
+--------------------------------------------------
+
+Calculated Column: 'Transactions Count' in Table 'customers'
+DAX Formula:
+Transactions Count =
+CALCULATE(
+    DISTINCTCOUNT(transactions[Invoice ID])
+)
+--------------------------------------------------
+
+Calculated Column: 'Days of Sale' in Table 'discounts'
+DAX Formula:
+Days of Sale =
+DATEDIFF([Start], [End], DAY) + 1
+--------------------------------------------------
+
+Calculated Column: 'Sale Name' in Table 'discounts'
+DAX Formula:
+Sale Name =
+TRIM(
+    MID(
+        [Description],
+        FIND(" our ", [Description]) + 5,
+        LEN([Description]) - FIND(" our ", [Description]) - 4
+    )
+)
+--------------------------------------------------
+
+Calculated Column: 'Size Count' in Table 'products'
+DAX Formula:
+Size Count =
+LEN([Sizes]) - LEN(SUBSTITUTE([Sizes], "|", "")) + 1
+--------------------------------------------------
+
+Calculated Column: 'Customer Type' in Table 'transactions'
+DAX Formula:
+Customer Type =
+VAR FirstPurchase = 
+    CALCULATE(
+        MIN(transactions[Date]),
+        ALLEXCEPT(transactions, transactions[Customer ID])
+    )
+RETURN
+    IF(transactions[Date] = FirstPurchase, "New", "Returning")
+--------------------------------------------------
+
+Calculated Column: 'Day Type' in Table 'transactions'
+DAX Formula:
+Day Type =
+IF(
+    WEEKDAY('transactions'[Date], 2) > 5,
+    "Weekend",
+    "Weekday"
+)
+--------------------------------------------------
+
+Calculated Column: 'Discount Bracket' in Table 'transactions'
+DAX Formula:
+Discount Bracket =
+SWITCH(
+    TRUE(),
+    Transactions[Discount] = 0, "0%",
+    Transactions[Discount] > 0 && Transactions[Discount] <= 0.20, "10%-20%",
+    Transactions[Discount] > 0.20 && Transactions[Discount] <= 0.30, "20%-30%",
+    Transactions[Discount] > 0.30 && Transactions[Discount] <= 0.40, "30%-40%",
+     Transactions[Discount] > 0.40, "40%+"
+)
+--------------------------------------------------
+
+Calculated Column: 'Invoice Total USD' in Table 'transactions'
+DAX Formula:
+Invoice Total USD =
+SWITCH(
+    transactions[Currency Symbol],
+    "$", transactions[Line Total] * 1,
+    "€", transactions[Line Total] * 1.0939,
+    "£", transactions[Line Total] * 1.30,
+    "¥", transactions[Line Total] *0.1383,
+    transactions[Line Total] * 0.14
+)
+--------------------------------------------------
+
+Calculated Column: 'Type of transactions' in Table 'transactions'
+DAX Formula:
+Type of transactions =
+IF(Transactions[Discount] = 0, "Full price",
+    IF(Transactions[Discount] > 0, "Discounted"))
+--------------------------------------------------
+
+Calculated Column: 'line Total USD' in Table 'transactions'
+DAX Formula:
+line Total USD =
+SWITCH(
+    transactions[Currency Symbol],
+    "$", transactions[Line Total] * 1,
+    "€", transactions[Line Total] * 1.0939,
+    "£", transactions[Line Total] * 1.30,
+    "¥", transactions[Line Total] *0.1383,
+    transactions[Line Total] * 0.14
+)
+--------------------------------------------------
