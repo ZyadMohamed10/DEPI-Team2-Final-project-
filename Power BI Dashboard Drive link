@@ -1,0 +1,12 @@
+# Power BI Dashboard
+
+The primary Power BI Desktop file (`MAVYN (Final).pbix`) is hosted on Google Drive due to its large size (224 MB), which exceeds GitHub's standard upload limit of 100 MB.
+
+🔗 **Drive Link:** https://drive.google.com/drive/folders/1PdHinFJqVamWdQspTgSkxEFRbUw8R4zu?usp=drive_link
+
+This file contains:
+- The full cleaned data model (Star Schema)
+- All calculated columns and DAX measures
+- 11 interactive dashboard pages (Overview, Revenue & Sales Performance, Transaction Analysis, Returns, Stores Performance, Employees, Customers, Customer Loyalty Analysis, Product Category Performance, Discount Overview, Profitability & Margin Analysis)
+
+> To view the dashboards, open this file with Power BI Desktop (free download from Microsoft).
