@@ -1,1 +1,13 @@
+# Raw Data Source
 
+The raw CSV files used in this project (transactions, customers, products, stores, discounts, employees) are hosted on Google Drive due to their large size (700MB+), which exceeds GitHub's file size limits.
+
+🔗 **Drive Link:** https://drive.google.com/drive/folders/1JD9Mu4VLwiyuKsmvlXjc7vtbfAnI_4IJ?usp=sharing
+
+Files included:
+- transactions.csv
+- customers.csv
+- products.csv
+- stores.csv
+- discounts.csv
+- employees.csv
