@@ -144,7 +144,7 @@ The primary Power BI file (`MAVYN (Final).pbix`) is **224 MB**, which exceeds Gi
   git commit -m "Add Power BI project file"
   git push origin main
   ```
-* **Option 2 (Alternative Cloud Link):** If you are downloading the repository directly from the GitHub web interface and cannot access the large file, you can download the complete `.pbix` file from our verified shared drive link here: **`[Insert Google Drive / OneDrive Link Here]`**.
+* **Option 2 (Alternative Cloud Link):** If you are downloading the repository directly from the GitHub web interface and cannot access the large file, you can download the complete `.pbix` file from our verified shared drive link here: **`(https://drive.google.com/drive/folders/1PdHinFJqVamWdQspTgSkxEFRbUw8R4zu?usp=drive_link)`**.
 
 ---
 
