@@ -94,11 +94,11 @@ This repository contains the core deliverables for the MAVYN graduation project:
 
 | File Name | Description |
 | :--- | :--- |
-| 📊 **[MAVYN (Final).pbix](MAVYN%20(Final).pbix)** | **Power BI Desktop Dashboard** containing the cleaned tables, star schema model, advanced DAX measures, and interactive reporting pages. |
-| 📝 **[MAVYN_Project_Documentation.docx](MAVYN_Project_Documentation.docx)** | **Comprehensive Project Documentation** (Project Planning, Stakeholder Analysis, Requirements, Data Quality Issues & ETL, DAX Formulas, and Final Insights). |
+| 📊 **[Power BI Dashboard Drive link](Power%20BI%20Dashboard%20Drive%20link)** | **Power BI Desktop Dashboard** hosted on Google Drive (224 MB) — cleaned tables, star schema model, advanced DAX measures, and 11 interactive reporting pages. |
+| 📁 **[Raw Data Drive link](Raw%20Data%20Drive%20link)** | Link to the raw CSV source files (transactions, customers, products, stores, discounts, employees) hosted on Google Drive due to their large size (700MB+). |
+| 📝 **[MAVYN_Project_Documentation.docx](MAVYN_Project_Documentation.docx)** | **Comprehensive Project Documentation** (Project Planning, Stakeholder Analysis, Requirements, Data Quality Issues & ETL, DAX Formulas, Power BI Dashboards, Excel Analysis, and Final Insights). |
 | 🎨 **[Tableau_Project_Documentation.docx](Tableau_Project_Documentation.docx)** | **Tableau Dashboard Documentation** outlining the financial, product, and geographical analysis dashboards built inside Tableau. |
 | 💻 **[dax_formulas.txt](dax_formulas.txt)** | **Source Code File** containing all plain-text DAX Calculated Columns and DAX Measures created for analytical reporting (easy for code review directly on GitHub). |
-| 📁 **[trash/](trash/)** | Archive folder containing raw data schemas, intermediate logs, scripts, and temporary extraction artifacts (cleanly separated from the final deliverables). |
 
 ---
 
@@ -129,22 +129,6 @@ RETURN
 
 > [!NOTE]
 > The full source code for all **50+ DAX measures** and **Calculated Columns** is categorized and documented in the **[dax_formulas.txt](dax_formulas.txt)** file.
-
----
-
-## ⚠️ Important Note on GitHub File Sizes
-The primary Power BI file (`MAVYN (Final).pbix`) is **224 MB**, which exceeds GitHub's standard upload limit of **100 MB**. 
-
-* **Option 1 (Git LFS):** We recommend using **Git LFS (Large File Storage)** to track and push this file:
-  ```bash
-  git lfs install
-  git lfs track "*.pbix"
-  git add .gitattributes
-  git add "MAVYN (Final).pbix"
-  git commit -m "Add Power BI project file"
-  git push origin main
-  ```
-* **Option 2 (Alternative Cloud Link):** If you are downloading the repository directly from the GitHub web interface and cannot access the large file, you can download the complete `.pbix` file from our verified shared drive link here: **`(https://drive.google.com/drive/folders/1PdHinFJqVamWdQspTgSkxEFRbUw8R4zu?usp=drive_link)`**.
 
 ---
 
